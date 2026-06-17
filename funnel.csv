@@ -1,0 +1,6 @@
+stage,pct_entered,note
+Entered queue,100,announced MW that entered the PJM serial queue
+Reached Feasibility,93,first study gate
+Reached System Impact,65,steepest drop: each project's share of network-upgrade cost is revealed
+Reached IA-executed,39,signed interconnection agreement (= r2 viability)
+Built (In Service),22.8,reached commercial operation (= built/entered)

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contingent vs Robust AI Power Demand — interactive</title>
+<style>
+  :root{
+    --navy:#1a365d; --slate:#4a5568; --body:#2d3748; --alt:#f7fafc;
+    --line:#e2e8f0; --good:#276749; --goodbg:#f0fff4; --warn:#975a16;
+    --bad:#9b2c2c; --badbg:#fff5f5; --accent:#2b6cb0;
+  }
+  *{box-sizing:border-box}
+  body{font-family:Arial,Helvetica,sans-serif;color:var(--body);margin:0;
+    background:#fff;line-height:1.45;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:980px;margin:0 auto;padding:28px 22px 60px}
+  h1{color:var(--navy);font-size:26px;margin:0 0 4px}
+  .sub{color:var(--slate);font-size:14px;margin:0 0 2px}
+  .stamp{color:var(--slate);font-size:12.5px;margin:6px 0 0}
+  .stamp a{color:var(--accent);text-decoration:none}
+  .stamp a:hover{text-decoration:underline}
+
+  .controls{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;
+    margin:22px 0 8px;padding:16px 18px;background:var(--alt);
+    border:1px solid var(--line);border-radius:8px}
+  .ctl label{display:block;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;
+    color:var(--slate);font-weight:bold;margin-bottom:6px}
+  .seg{display:inline-flex;border:1px solid var(--navy);border-radius:6px;overflow:hidden}
+  .seg button{appearance:none;border:0;background:#fff;color:var(--navy);
+    padding:8px 14px;font-size:13.5px;cursor:pointer;font-family:inherit}
+  .seg button+button{border-left:1px solid var(--navy)}
+  .seg button.on{background:var(--navy);color:#fff;font-weight:bold}
+
+  .spotlight{margin:14px 0 6px;padding:12px 16px;border-left:4px solid var(--navy);
+    background:#fbfdff;font-size:14px;color:var(--body)}
+  .spotlight b{color:var(--navy)}
+
+  .panel{display:none}
+  .panel.on{display:block}
+
+  /* calculator */
+  .calc{margin-top:16px;border:1px solid var(--line);border-radius:8px;padding:18px 20px}
+  .annc{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+  .annc label{font-size:13.5px;font-weight:bold;color:var(--body)}
+  .annc input{width:120px;padding:7px 9px;font-size:15px;font-family:inherit;
+    border:1px solid var(--line);border-radius:6px;text-align:right;font-variant-numeric:tabular-nums}
+  .annc .u{color:var(--slate);font-size:13px}
+  .annc button{margin-left:auto;appearance:none;border:1px solid var(--navy);background:#fff;
+    color:var(--navy);border-radius:6px;padding:7px 12px;font-size:12.5px;cursor:pointer;font-family:inherit}
+  .sliders{margin:14px 0 4px}
+  .srow{display:grid;grid-template-columns:230px 1fr 56px;gap:12px;align-items:center;margin:11px 0}
+  .srow .lab{font-size:13px}
+  .srow .lab small{display:block;color:var(--slate);font-size:11px;font-weight:normal}
+  .srow input[type=range]{width:100%;accent-color:var(--navy)}
+  .srow .v{text-align:right;font-variant-numeric:tabular-nums;font-weight:bold;color:var(--navy)}
+  .wf{margin-top:18px;border-top:1px solid var(--line);padding-top:14px}
+  .wfrow{display:grid;grid-template-columns:200px 1fr 150px;gap:12px;align-items:center;margin:8px 0}
+  .wfrow .wl{font-size:13px}
+  .wfrow .wl small{color:var(--slate)}
+  .bar{height:24px;background:var(--alt);border-radius:4px;overflow:hidden;border:1px solid var(--line)}
+  .bar .fill{height:100%;transition:width .18s ease}
+  .f0 .fill{background:#cbd5e0}
+  .f1 .fill{background:#7c93b0}
+  .f2 .fill{background:#3f5e86}
+  .f3 .fill{background:var(--good)}
+  .wfrow .amt{text-align:right;font-variant-numeric:tabular-nums;font-weight:bold}
+  .wfrow .amt small{display:block;color:var(--slate);font-weight:normal;font-size:11px}
+
+  /* tables (evidence) */
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:8px 0 4px}
+  thead th{background:var(--navy);color:#fff;text-align:left;padding:9px 10px;font-size:12.5px}
+  thead th.num{text-align:right}
+  tbody td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+  tbody tr:nth-child(even){background:var(--alt)}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .minibar{height:14px;background:var(--alt);border-radius:3px;overflow:hidden;min-width:80px}
+  .minibar .fill{height:100%;background:var(--navy)}
+  .mature{font-weight:bold;color:var(--navy)}
+  .dim{color:var(--slate);font-size:12px}
+  h3{color:var(--navy);font-size:16px;margin:22px 0 2px}
+
+  .foot{margin-top:30px;font-size:12px;color:var(--slate);border-top:1px solid var(--line);padding-top:16px}
+  .foot p{margin:0 0 8px}
+  .foot b{color:var(--body)}
+  details{margin:10px 0}
+  summary{cursor:pointer;color:var(--accent);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Contingent vs Robust AI Power Demand</h1>
+  <p class="sub">How much <em>announced</em> generation capacity actually gets <em>built</em> — a realized-completion anchor from the PJM interconnection queue. <em>Announced is not deliverable.</em></p>
+  <p class="stamp">Interactive front-end over the published v0.1 aggregates · data as of 2026-06 · canonical record: <a href="https://doi.org/10.5281/zenodo.20559430" target="_blank" rel="noopener">DOI 10.5281/zenodo.20559430</a> · N. Milton, ORCID 0009-0003-4213-7769 · CC BY 4.0</p>
+
+  <div class="controls">
+    <div class="ctl">
+      <label>View</label>
+      <div class="seg" id="view">
+        <button data-v="calc" class="on">Deflation calculator</button>
+        <button data-v="evidence">PJM evidence</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="spotlight" id="spot"></div>
+
+  <!-- CALCULATOR -->
+  <div class="panel on" id="p-calc">
+    <div class="calc">
+      <div class="annc">
+        <label for="annc">Announced capacity</label>
+        <input id="annc" type="number" min="0" step="1" value="100">
+        <span class="u">GW</span>
+        <button id="reset">Reset to PJM measured</button>
+      </div>
+      <div class="sliders">
+        <div class="srow">
+          <span class="lab">De-duplication (r1)<small>removes literal duplicate filings</small></span>
+          <input id="r1" type="range" min="0.70" max="1.00" step="0.01">
+          <span class="v" id="r1v"></span>
+        </div>
+        <div class="srow">
+          <span class="lab">Viability survival (r2)<small>entered &rarr; signed interconnection agreement</small></span>
+          <input id="r2" type="range" min="0.20" max="0.70" step="0.01">
+          <span class="v" id="r2v"></span>
+        </div>
+        <div class="srow">
+          <span class="lab">Build rate (r3)<small>signed agreement &rarr; in service</small></span>
+          <input id="r3" type="range" min="0.40" max="0.80" step="0.01">
+          <span class="v" id="r3v"></span>
+        </div>
+      </div>
+      <div class="wf" id="wf"></div>
+    </div>
+  </div>
+
+  <!-- EVIDENCE -->
+  <div class="panel" id="p-evidence">
+    <h3>The completion funnel — 2010–2017 cohort, 204 GW entered</h3>
+    <p class="dim">Each milestone is conditional on surviving the previous one, so the rates multiply. The steepest drop is at the System Impact Study, where a project learns its share of network-upgrade costs.</p>
+    <table><thead><tr><th>Stage</th><th class="num">% of entered</th><th></th><th>what it is</th></tr></thead>
+      <tbody id="funnel-rows"></tbody></table>
+    <p class="dim"><b>Where the MW die:</b> 61% of announced MW exit <em>before</em> a signed agreement; another 13% exit <em>after</em> one (a signed IA converted to service only ~58% of the time). The gap is viability and build, not paperwork.</p>
+
+    <h3>Realized completion by submitted cohort</h3>
+    <p class="dim">Recent cohorts read low only because they have not had time to resolve, so the headline uses the mature, near-fully-resolved windows (bold). Those converge on ~16–25% built — about one announced MW in five.</p>
+    <table><thead><tr><th>Cohort</th><th class="num">% built</th><th></th><th class="num">% withdrawn</th><th>maturity</th></tr></thead>
+      <tbody id="cohort-rows"></tbody></table>
+  </div>
+
+  <div class="foot">
+    <p><b>What this is.</b> A realized announced-to-in-service completion rate from PJM's own resolved serial queue (8,253 generation projects, ~837 GW announced). The calculator lets you deflate any announced headline through the three measured attrition stages and watch the deliverable move. Defaults are the PJM mature-cohort base rate; the sliders are for sensitivity, not invention.</p>
+    <p><b>The load-bearing assumption.</b> The mature 2010–2017 cohort is <em>generic historical generation</em> (wind/solar/gas) used as a completion base rate — not capacity announced to serve AI. Transferring that rate to the AI-era cohort is the named assumption (cohort comparability); FERC Order 2023 could raise completion, speculation could lower it.</p>
+    <p><b>Supply, not demand.</b> This deflates the generation side, not the ~950 TWh demand headline. De-duplication barely moves the result (r1 ≈ 0.81–0.92): the gap is overwhelmingly viability and build. "Built" counts only In Service (conservative, biases the rate down). The output is a band with the announced-vs-deliverable gap as the softest input — treat any headline as a scenario, not a baseline.</p>
+    <details><summary>Guardrails — read before citing</summary>
+      <p style="margin-top:10px">No raw PJM data is bundled here (it carries a redistribution restriction); only the published derived aggregates. The full method reads a locally-obtained PJM export — see the Zenodo record. r2 × r3 = built/entered is an algebraic identity, not an independent check. Anchors (LBNL ~14–20% national; Exelon ~22% of company pipeline) are loosely comparable, not like-for-like.</p>
+    </details>
+    <p style="margin-top:12px"><b>Disclosure.</b> No third party reviewed, funded, or directed this work. Independent analysis, not investment advice.</p>
+    <p><b>Reproducibility.</b> This page embeds the published aggregates (<code>funnel.csv</code>, <code>cohorts.csv</code>) verbatim, regenerated by <code>build.py</code>; the full <code>reproduce.py</code> and write-up live in the <a href="https://doi.org/10.5281/zenodo.20559430" target="_blank" rel="noopener">Zenodo record</a>.</p>
+  </div>
+</div>
+
+<script>
+// ---- frozen aggregates: regenerated from CSV by build.py ----
+const FUNNEL = `stage,pct_entered,note
+Entered queue,100,announced MW that entered the PJM serial queue
+Reached Feasibility,93,first study gate
+Reached System Impact,65,steepest drop: each project's share of network-upgrade cost is revealed
+Reached IA-executed,39,signed interconnection agreement (= r2 viability)
+Built (In Service),22.8,reached commercial operation (= built/entered)`;
+const COHORTS = `cohort,pct_resolved,pct_built,pct_withdrawn,maturity
+2009 and earlier,100,16,84,mature
+2010-14,100,25,75,mature
+2015-17,92,20,71,mature
+2018-20,75,3,72,still building
+2021-25,84,0,84,too new (already shed 84%)`;
+
+function parseCSV(t){
+  const rows=[]; let i=0,f='',row=[],q=false;
+  while(i<t.length){const c=t[i];
+    if(q){ if(c==='"'){ if(t[i+1]==='"'){f+='"';i++;} else q=false;} else f+=c; }
+    else { if(c==='"')q=true; else if(c===','){row.push(f);f='';}
+      else if(c==='\n'){row.push(f);rows.push(row);row=[];f='';}
+      else if(c==='\r'){} else f+=c; }
+    i++; }
+  if(f.length||row.length){row.push(f);rows.push(row);}
+  return rows;
+}
+function toObj(t){ const r=parseCSV(t),h=r[0];
+  return r.slice(1).filter(x=>x.length>1).map(x=>{const o={};h.forEach((k,j)=>o[k]=x[j]===undefined?'':x[j]);return o;}); }
+
+const funnel = toObj(FUNNEL).map(o=>({stage:o.stage, pct:Number(o.pct_entered), note:o.note}));
+const cohorts = toObj(COHORTS).map(o=>({cohort:o.cohort, built:Number(o.pct_built),
+  withdrawn:Number(o.pct_withdrawn), resolved:Number(o.pct_resolved), maturity:o.maturity}));
+
+// measured defaults, derived from the funnel where possible
+const ia = funnel.find(f=>/IA-executed/i.test(f.stage)).pct;        // 39
+const builtPct = funnel.find(f=>/Built/i.test(f.stage)).pct;        // 22.8
+const DEF = { r1:0.85, r2:+(ia/100).toFixed(2), r3:+(builtPct/ia).toFixed(2) }; // 0.85, 0.39, 0.58
+let state = { announced:100, r1:DEF.r1, r2:DEF.r2, r3:DEF.r3 };
+
+function gw(x){ return x.toFixed(1); }
+function setSliders(){
+  for(const k of ['r1','r2','r3']){ document.getElementById(k).value=state[k];
+    document.getElementById(k+'v').textContent=state[k].toFixed(2); }
+  document.getElementById('annc').value=state.announced;
+}
+function renderWF(){
+  const A=state.announced, dedup=A*state.r1, iaG=dedup*state.r2, built=iaG*state.r3;
+  const pct = A>0? built/A*100 : 0;
+  const stages=[
+    ['f0','Announced',A,'raw headline'],
+    ['f1','After de-duplication',dedup,'minus literal duplicates (r1)'],
+    ['f2','Reaches signed agreement',iaG,'survives the viability screen (r2)'],
+    ['f3','Built (deliverable)',built,'reaches commercial operation (r3)'],
+  ];
+  const max=A||1;
+  document.getElementById('wf').innerHTML = stages.map(s=>
+    '<div class="wfrow '+s[0]+'"><span class="wl">'+s[1]+'<br><small>'+s[3]+'</small></span>'+
+    '<div class="bar"><div class="fill" style="width:'+(100*s[2]/max)+'%"></div></div>'+
+    '<span class="amt">'+gw(s[2])+' GW<small>'+(100*s[2]/max).toFixed(0)+'% of announced</small></span></div>'
+  ).join('');
+  // leaks
+  const preIA = A - iaG, postIA = iaG - built;
+  const ratio = built>0? (A/built):0;
+  document.getElementById('spot').innerHTML =
+    'Of <b>'+gw(A)+' GW</b> announced, <b>'+gw(built)+' GW</b> is deliverable — <b>'+pct.toFixed(1)+'%</b>'+
+    (ratio? ', about <b>1 in '+ratio.toFixed(1)+'</b>' : '')+'. '+
+    'Biggest leak: the viability screen before a signed agreement loses <b>'+gw(preIA)+' GW</b>'+
+    '; post-agreement non-build loses another '+gw(postIA)+' GW. '+
+    (Math.abs(state.r1-DEF.r1)<1e-9&&Math.abs(state.r2-DEF.r2)<1e-9&&Math.abs(state.r3-DEF.r3)<1e-9
+      ? '<i>(PJM measured base rate.)</i>' : '<i>(your scenario — reset for the PJM measured base rate.)</i>');
+}
+function renderEvidence(){
+  document.getElementById('funnel-rows').innerHTML = funnel.map(f=>
+    '<tr><td>'+f.stage+'</td><td class="num">'+f.pct+'%</td>'+
+    '<td><div class="minibar"><div class="fill" style="width:'+f.pct+'%"></div></div></td>'+
+    '<td class="dim">'+f.note+'</td></tr>').join('');
+  document.getElementById('cohort-rows').innerHTML = cohorts.map(c=>{
+    const m = c.maturity==='mature';
+    return '<tr><td class="'+(m?'mature':'')+'">'+c.cohort+'</td>'+
+      '<td class="num '+(m?'mature':'')+'">'+c.built+'%</td>'+
+      '<td><div class="minibar"><div class="fill" style="width:'+c.built+'%"></div></div></td>'+
+      '<td class="num">'+c.withdrawn+'%</td><td class="dim">'+c.maturity+'</td></tr>'; }).join('');
+}
+
+let view='calc';
+function render(){
+  document.getElementById('p-calc').classList.toggle('on', view==='calc');
+  document.getElementById('p-evidence').classList.toggle('on', view==='evidence');
+  if(view==='calc'){ renderWF(); }
+  else {
+    renderEvidence();
+    document.getElementById('spot').innerHTML =
+      'The PJM serial queue is a funnel most projects leave: <b>61%</b> of announced MW exit before a signed '+
+      'agreement, the steepest drop at the cost-revealing System Impact Study. Mature cohorts converge on '+
+      '<b>~16–25% built</b> — about one announced MW in five.';
+  }
+}
+
+// wire
+document.getElementById('view').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  document.querySelectorAll('#view button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); view=b.dataset.v; render();
+});
+for(const k of ['r1','r2','r3']){
+  document.getElementById(k).addEventListener('input',e=>{
+    state[k]=Number(e.target.value); document.getElementById(k+'v').textContent=state[k].toFixed(2); renderWF();
+  });
+}
+document.getElementById('annc').addEventListener('input',e=>{
+  state.announced=Math.max(0,Number(e.target.value)||0); renderWF();
+});
+document.getElementById('reset').addEventListener('click',()=>{
+  state={announced:100, r1:DEF.r1, r2:DEF.r2, r3:DEF.r3}; setSliders(); renderWF();
+});
+
+setSliders(); render();
+</script>
+</body>
+</html>

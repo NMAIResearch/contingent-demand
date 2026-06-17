@@ -1,0 +1,30 @@
+{
+  "title": "Contingent vs Robust AI Power Demand (interactive)",
+  "upload_type": "software",
+  "license": "CC-BY-4.0",
+  "creators": [
+    {
+      "name": "Milton, N.",
+      "orcid": "0009-0003-4213-7769"
+    }
+  ],
+  "description": "An interactive, explorable front-end to Contingent vs Robust AI Power Demand: a realized announced-to-in-service completion anchor from the PJM interconnection queue, where most announced generation projects leave the funnel. A deflation calculator deflates any announced capacity through three measured attrition stages (de-duplication, viability survival to a signed interconnection agreement, and build rate), with defaults set to the PJM mature-cohort base rate (about one announced MW in five built); a second view shows the published completion funnel and realized completion by cohort. No raw PJM data is bundled (it carries a redistribution restriction); only the published derived aggregates. Supply-side deflation, not the demand headline. Companion to the paper at DOI 10.5281/zenodo.20559430. CC BY 4.0.",
+  "keywords": [
+    "AI power demand",
+    "data centre electricity",
+    "interconnection queue",
+    "PJM",
+    "completion rate",
+    "deflation",
+    "reproducibility",
+    "interactive visualization",
+    "energy"
+  ],
+  "related_identifiers": [
+    {
+      "relation": "isSupplementTo",
+      "identifier": "10.5281/zenodo.20559430",
+      "scheme": "doi"
+    }
+  ]
+}

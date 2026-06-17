@@ -1,0 +1,6 @@
+cohort,pct_resolved,pct_built,pct_withdrawn,maturity
+2009 and earlier,100,16,84,mature
+2010-14,100,25,75,mature
+2015-17,92,20,71,mature
+2018-20,75,3,72,still building
+2021-25,84,0,84,too new (already shed 84%)
