@@ -2,9 +2,9 @@
 
 An interactive front-end to *Contingent vs Robust AI Power Demand*: a realized announced-to-in-service **completion anchor** from the PJM interconnection queue. The thesis is simple — *announced capacity is not deliverable capacity* — and the tool lets you watch any announced headline deflate through the three measured attrition stages.
 
-**Live tool:** https://nmiltonresearch.github.io/contingent-demand/
+**Live tool:** https://nmairesearch.github.io/contingent-demand/
 **Canonical record (frozen, citable):** [DOI 10.5281/zenodo.20559430](https://doi.org/10.5281/zenodo.20559430)
-**Author:** N. Milton · ORCID [0009-0003-4213-7769](https://orcid.org/0009-0003-4213-7769) · Licence CC BY 4.0
+**Author:** NM AI Research · ORCID [0009-0003-4213-7769](https://orcid.org/0009-0003-4213-7769) · Licence CC BY 4.0
 
 ## What it does
 
